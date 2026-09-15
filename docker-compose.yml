@@ -36,6 +36,14 @@ services:
     volumes:
       - azurite_data:/data
 
+  wiremock:
+    image: wiremock/wiremock:3.9.1
+    container_name: temporal-wonder-wiremock
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./wiremock:/home/wiremock
+
 volumes:
   temporal_data:
   azurite_data:

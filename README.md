@@ -62,6 +62,7 @@ flowchart LR
         T["Temporal Server + Web UI (:8233)"]
         DB[("SQLite Persistens")]
         Az["Azurite: Blob Emulator (:10000)"]
+        WM["WireMock: Logic App Mock (:8080)"]
     end
 ```
 
@@ -74,6 +75,7 @@ Tjenestene blir tilgjengelige på:
 - **Temporal Web UI**: [http://localhost:8233](http://localhost:8233)
 - **Temporal gRPC API**: `localhost:7233`
 - **Azurite Blob Service**: `http://localhost:10000`
+- **WireMock Logic App Mock**: `http://localhost:8080`
 
 ### 2. Konfigurasjon
 Kopier eksempelkonfigurasjonen til `.env` ved behov:
@@ -103,6 +105,35 @@ uv run python -m temporal_wonder.starter --manifest examples/sample-manifest.yam
 ```bash
 docker compose down
 ```
+
+---
+
+## Test-harness og Mock-infrastruktur
+
+Testsuiten kan kjøres helautomatisert og deterministisk uten behov for kjørende Docker-containere eller eksterne nettverkskall:
+
+```mermaid
+sequenceDiagram
+    participant Runner as Test Runner (pytest / CI)
+    participant TEnv as Temporal TestEnv (Time Skipping)
+    participant WF as Orchestrator Workflow
+    participant Mock as LogicAppMockServer (In-process HTTP)
+
+    Runner->>Mock: Start Mock HTTP Server (ephemeral port)
+    Runner->>TEnv: Start WorkflowEnvironment
+    Runner->>WF: Start workflow med sample-manifest.yaml
+    WF->>Mock: HTTP POST mot Logic App mock-endepunkt
+    Mock-->>WF: 200 OK (eller 500 Retry)
+    WF-->>TEnv: Fullført (COMPLETED)
+    TEnv-->>Runner: Verifiser resultat & kallhistorikk
+```
+
+- **In-process mock-server (`LogicAppMockServer`)**: Starter en lettvekts HTTP-server på `127.0.0.1` med dynamisk portallokering. Støtter rutedefinisjoner, feilsimulering (`500 Internal Server Error`), og sekvensielle responser for å teste Temporal `RetryPolicy`.
+- **Temporal `WorkflowEnvironment`**: Utfører tidsspoling for å verifisere retry-intervaller og timeouts momentant i tester.
+- **Kjør hele testpakken med én kommando**:
+  ```bash
+  uv run pytest -v
+  ```
 
 ---
 
