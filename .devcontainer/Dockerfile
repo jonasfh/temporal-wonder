@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \
     build-essential \
+    gh \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv for fast dependency management
