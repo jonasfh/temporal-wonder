@@ -7,6 +7,7 @@ from typing import Any
 from uuid import uuid4
 
 from temporalio.client import Client
+from temporalio.runtime import LoggingConfig, Runtime, TelemetryConfig, TelemetryFilter
 from temporalio.worker import Worker
 
 from temporal_wonder.activities.legacy.logic_app import call_legacy_logic_app
@@ -18,6 +19,20 @@ DEFAULT_TEST_ACTIVITIES: list[Callable[..., Any]] = [
     call_legacy_logic_app,
     execute_native_step,
 ]
+
+
+def get_test_runtime() -> Runtime:
+    """Return a Temporal Runtime configured for test environments.
+
+    Sets Rust SDK core log level to ERROR to suppress harmless capability
+    warnings (e.g. activity_failure_include_heartbeat) when running against
+    in-memory ephemeral test servers.
+    """
+    return Runtime(
+        telemetry=TelemetryConfig(
+            logging=LoggingConfig(filter=TelemetryFilter(core_level="ERROR", other_level="ERROR"))
+        )
+    )
 
 
 def create_test_worker(

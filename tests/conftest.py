@@ -12,6 +12,7 @@ import pytest
 from temporalio.testing import WorkflowEnvironment
 
 from temporal_wonder.config import get_settings
+from temporal_wonder.testing.harness import get_test_runtime
 from temporal_wonder.testing.mock_server import LogicAppMockServer
 
 
@@ -70,5 +71,5 @@ def logic_app_mock() -> Iterator[LogicAppMockServer]:
 @pytest.fixture
 async def temporal_env() -> AsyncIterator[WorkflowEnvironment]:
     """Provide a Temporal WorkflowEnvironment with time skipping enabled."""
-    async with await WorkflowEnvironment.start_time_skipping() as env:
+    async with await WorkflowEnvironment.start_time_skipping(runtime=get_test_runtime()) as env:
         yield env
