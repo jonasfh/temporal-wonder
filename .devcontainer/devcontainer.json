@@ -36,10 +36,14 @@
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
         "tamasfe.even-better-toml",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "google.google-antigravity",
+        "mermaidchart.vscode-mermaid-chart"
       ]
     }
   },
-  "postCreateCommand": "uv venv && uv pip install -e \".[dev]\"",
-  "remoteUser": "vscode"
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.gemini; uv venv && uv pip install -e \".[dev]\"",
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-gemini-data,target=/home/vscode/.gemini,type=volume"
+  ]
 }
