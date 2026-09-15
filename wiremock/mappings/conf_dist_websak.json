@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/api/logicapps/conf_dist_websak.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "COMPLETED",
+      "action": "conf_dist_websak",
+      "archiveCaseId": "WS-2026-0001",
+      "message": "Archived successfully in Websak"
+    }
+  }
+}

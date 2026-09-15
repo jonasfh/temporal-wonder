@@ -40,6 +40,14 @@ class Settings(BaseSettings):
         default="integration-files",
         description="Azure Blob Storage container name for pipeline files.",
     )
+    logic_app_base_url: str = Field(
+        default="http://localhost:8080",
+        description="Base URL for Azure Logic Apps HTTP endpoints or mock server.",
+    )
+    logic_app_timeout_seconds: float = Field(
+        default=30.0,
+        description="HTTP request timeout in seconds for Logic App activity invocations.",
+    )
     log_level: str = Field(
         default="INFO",
         description="Logging level (DEBUG, INFO, WARNING, ERROR).",

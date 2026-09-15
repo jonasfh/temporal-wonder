@@ -49,6 +49,20 @@ def test_docker_compose_azurite_service() -> None:
     assert any("10000" in p for p in ports), "Azurite Blob port 10000 must be exposed"
 
 
+def test_docker_compose_wiremock_service() -> None:
+    """Verify WireMock service configuration and ports."""
+    compose_path = Path("docker-compose.yml")
+    data: dict[str, Any] = yaml.safe_load(compose_path.read_text(encoding="utf-8"))
+    services = data["services"]
+
+    assert "wiremock" in services, "Must include 'wiremock' service"
+    wiremock = services["wiremock"]
+
+    assert "wiremock/wiremock" in wiremock["image"]
+    ports = [str(p) for p in wiremock.get("ports", [])]
+    assert any("8080" in p for p in ports), "WireMock port 8080 must be exposed"
+
+
 def test_env_example_matches_compose() -> None:
     """Verify .env.example exists and contains expected local endpoints."""
     env_path = Path(".env.example")
@@ -58,3 +72,4 @@ def test_env_example_matches_compose() -> None:
     assert "TEMPORAL_HOST_URL=localhost:7233" in content
     assert "10000" in content
     assert "TEMPORAL_TASK_QUEUE" in content
+    assert "LOGIC_APP_BASE_URL=http://localhost:8080" in content

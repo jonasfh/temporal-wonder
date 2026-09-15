@@ -55,18 +55,27 @@ Dette prosjektet følger en streng GitHub issue-drevet utviklingsmodell som spes
 
 ## 4. Testing & Kvalitetssikring
 
-- **Kjør tester**:
+Prosjektet har en komplett testinfrastruktur som kjører lokalt og i CI/CD uten eksterne avhengigheter:
+
+- **Kjør hele testsuiten med én kommando**:
   ```bash
-  pytest
+  uv run pytest -v
   ```
 - **Type-sjekking (Mypy)**:
   ```bash
-  mypy src tests
+  uv run mypy src tests
   ```
 - **Linting og formatering (Ruff)**:
   ```bash
-  ruff format --check .
-  ruff check .
+  uv run ruff format --check .
+  uv run ruff check .
   ```
-- Workflows testes deterministisk ved hjelp av Temporals `TestWorkflowEnvironment`.
-- Eksterne tjenester (Logic Apps, Altinn, registre) mockes ut under test.
+
+### Test-harness og Mocking-struktur
+- **Temporal `WorkflowEnvironment`**: Testene benytter `WorkflowEnvironment.start_time_skipping()` (se `tests/conftest.py`) for lokal tidsspoling og testing av orkestreringslogikk og `RetryPolicy` uten ventetid.
+- **In-process `LogicAppMockServer`**: Simulerer Azure Logic Apps HTTP-endepunkter (`POST /api/logicapps/{action}`). Tilgjengelig via pytest-fixturen `logic_app_mock`.
+  - Støtter tilpassede svarkoder (`200 OK`, `500 Server Error`, etc.).
+  - Støtter sekvensielle responser (`set_response_sequence`) for å verifisere retry-oppførsel ved transiente feil.
+  - Logger alle mottatte requester for etterprøving (`logic_app_mock.recorded_requests`).
+- **WireMock i Docker Compose**: For manuell lokal testing mot en ekstern container tilbyr `docker-compose.yml` en WireMock-instans på port 8080 med forhåndsdefinerte mappings i `wiremock/mappings/`.
+- **GitHub Actions CI**: `.github/workflows/ci.yml` kjører automatisk ruff, mypy og pytest på alle commits og pull requests mot `main`.

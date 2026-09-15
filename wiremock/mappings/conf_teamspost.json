@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/api/logicapps/conf_teamspost.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "COMPLETED",
+      "action": "conf_teamspost",
+      "message": "Notification successfully posted to Teams channel",
+      "delivered": true
+    }
+  }
+}
