@@ -28,7 +28,7 @@ Dette prosjektet følger en streng GitHub issue-drevet utviklingsmodell som spes
 
 ## 3. Utviklingsmiljø & Devcontainers
 
-- **Devcontainer**: Prosjektet tilbyr en ferdig `.devcontainer/`-konfigurasjon basert på Python 3.14 med `uv` og anbefalte utvidelser for VS Code / Codespaces.
+- **Devcontainer**: Prosjektet tilbyr en ferdig `.devcontainer/`-konfigurasjon basert på Python 3.14 med `uv`, `docker-outside-of-docker` og anbefalte utvidelser for VS Code / Codespaces.
 - **Lokal installasjon med `uv`**:
   ```bash
   # Opprett virtuelt miljø og installer pakken med utvikleravhengigheter
@@ -36,6 +36,20 @@ Dette prosjektet følger en streng GitHub issue-drevet utviklingsmodell som spes
   source .venv/bin/activate
   uv pip install -e ".[dev]"
   ```
+- **Lokal stack (Temporal & Azurite)**:
+  ```bash
+  docker compose up -d
+  cp .env.example .env
+  ```
+- **Kjøre worker lokalt**:
+  ```bash
+  uv run python -m temporal_wonder.worker
+  ```
+- **Starte testflyt**:
+  ```bash
+  uv run python -m temporal_wonder.starter --manifest examples/sample-manifest.yaml
+  ```
+  Web UI er tilgjengelig på [http://localhost:8233](http://localhost:8233).
 
 ---
 
