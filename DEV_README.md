@@ -26,8 +26,33 @@ Dette prosjektet følger en streng GitHub issue-drevet utviklingsmodell som spes
 
 ---
 
-## 3. Testing
+## 3. Utviklingsmiljø & Devcontainers
 
-- Test-Driven Development (TDD) praktiseres for alle nye aktiviteter og workflows.
+- **Devcontainer**: Prosjektet tilbyr en ferdig `.devcontainer/`-konfigurasjon basert på Python 3.14 med `uv` og anbefalte utvidelser for VS Code / Codespaces.
+- **Lokal installasjon med `uv`**:
+  ```bash
+  # Opprett virtuelt miljø og installer pakken med utvikleravhengigheter
+  uv venv
+  source .venv/bin/activate
+  uv pip install -e ".[dev]"
+  ```
+
+---
+
+## 4. Testing & Kvalitetssikring
+
+- **Kjør tester**:
+  ```bash
+  pytest
+  ```
+- **Type-sjekking (Mypy)**:
+  ```bash
+  mypy src tests
+  ```
+- **Linting og formatering (Ruff)**:
+  ```bash
+  ruff format --check .
+  ruff check .
+  ```
 - Workflows testes deterministisk ved hjelp av Temporals `TestWorkflowEnvironment`.
 - Eksterne tjenester (Logic Apps, Altinn, registre) mockes ut under test.

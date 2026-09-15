@@ -1,0 +1,99 @@
+{
+  "$schema": "../schemas/manifest.schema.json",
+  "identifier": "krt-0000a-1-modernized",
+  "version": "1.0.0",
+  "title": "Åpen test skjema - Strangler Fig Modernisert",
+  "description": "Temporal integrasjons-DAG som demonstrerer trinnvis migrering fra Logic Apps til native aktiviteter.",
+  "domain": "bank",
+  "classification": "K2",
+  "is_active": true,
+  "system_options": {
+    "top_level_folder": "bank"
+  },
+  "trigger": {
+    "type": "altinn3_instance",
+    "name": "wf_altinn_instance_handling_shared",
+    "config": {
+      "app_id": "finanstilsynet/krt-0000a-1"
+    }
+  },
+  "steps": [
+    {
+      "id": "step_teams_notification",
+      "name": "Post varsel til Teams (Legacy)",
+      "type": "legacy_logic_app",
+      "action": "conf_teamspost",
+      "dependsOn": [],
+      "parameters": {
+        "uri_keyvault_secret": "int_teams_notification_krt1801"
+      },
+      "retryPolicy": {
+        "initialInterval": "2s",
+        "backoffCoefficient": 2.0,
+        "maximumAttempts": 3
+      },
+      "timeout": {
+        "startToCloseTimeout": "60s"
+      }
+    },
+    {
+      "id": "step_fetch_altinn_data",
+      "name": "Hent Altinn 3 Instansdata (Native)",
+      "type": "native",
+      "action": "activities.altinn3.fetch_instance_data",
+      "dependsOn": [],
+      "parameters": {
+        "include_binary_attachments": true
+      },
+      "timeout": {
+        "startToCloseTimeout": "120s"
+      }
+    },
+    {
+      "id": "step_process_xml",
+      "name": "Valider og Transformer XML (Native)",
+      "type": "native",
+      "action": "activities.xml.transform_eba_format",
+      "dependsOn": [
+        "step_fetch_altinn_data"
+      ],
+      "timeout": {
+        "startToCloseTimeout": "180s"
+      }
+    },
+    {
+      "id": "step_archive_websak",
+      "name": "Arkiver sak i Websak (Legacy)",
+      "type": "legacy_logic_app",
+      "action": "conf_dist_websak",
+      "dependsOn": [
+        "step_process_xml"
+      ],
+      "parameters": {
+        "journal_enhet": "511.6"
+      },
+      "timeout": {
+        "startToCloseTimeout": "300s"
+      }
+    },
+    {
+      "id": "step_send_receipt",
+      "name": "Send bekreftelse til innsender (Native)",
+      "type": "native",
+      "action": "activities.email.send_receipt_notification",
+      "dependsOn": [
+        "step_archive_websak"
+      ],
+      "condition": {
+        "type": "exists",
+        "source": "form_item.dataValues.Kontaktperson1Epost"
+      },
+      "parameters": {
+        "template_name": "krt-3000"
+      },
+      "timeout": {
+        "startToCloseTimeout": "60s"
+      }
+    }
+  ]
+}

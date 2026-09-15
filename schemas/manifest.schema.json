@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://finanstilsynet.no/schemas/temporal-wonder/manifest.schema.json",
+  "title": "Temporal Wonder Integration Manifest",
+  "description": "Declarative DAG manifest describing integration workflows, execution steps, and migration targets in Temporal.",
+  "type": "object",
+  "required": [
+    "identifier",
+    "version",
+    "steps"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema URI reference."
+    },
+    "identifier": {
+      "type": "string",
+      "description": "Unique machine-readable identifier for the integration manifest (e.g., 'krt-0000a-1').",
+      "pattern": "^[a-zA-Z0-9_\\-\\.]+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of this integration workflow definition.",
+      "default": "1.0.0"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title describing the integration workflow."
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed explanation of the workflow purpose and business context."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Business domain or sector (e.g., 'bank', 'forsikring', 'verdipapir')."
+    },
+    "classification": {
+      "type": "string",
+      "description": "Security or data classification level (e.g., 'K1', 'K2', 'K3')."
+    },
+    "is_active": {
+      "type": "boolean",
+      "description": "Whether this integration workflow is enabled for orchestration.",
+      "default": true
+    },
+    "system_options": {
+      "type": "object",
+      "description": "Platform-level options (e.g., folder paths, storage account references).",
+      "additionalProperties": true
+    },
+    "trigger": {
+      "type": "object",
+      "description": "Trigger definition that initiates the workflow DAG.",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of trigger (e.g., 'altinn3_instance', 'cron', 'manual', 'event')."
+        },
+        "name": {
+          "type": "string",
+          "description": "Descriptive name of the trigger or source workflow."
+        },
+        "config": {
+          "type": "object",
+          "description": "Trigger-specific parameters.",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "steps": {
+      "type": "array",
+      "description": "List of pipeline steps constituting the workflow DAG.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/Step"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Step": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "type",
+        "action"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this step within the manifest DAG.",
+          "pattern": "^[a-zA-Z0-9_\\-\\.]+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable step name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional step description."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "legacy_logic_app",
+            "native"
+          ],
+          "description": "Execution type: 'legacy_logic_app' for Strangler Fig delegation or 'native' for modern activities."
+        },
+        "action": {
+          "type": "string",
+          "description": "Activity identifier or legacy Logic App configuration name."
+        },
+        "dependsOn": {
+          "type": "array",
+          "description": "List of step IDs that must complete before this step executes.",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "condition": {
+          "$ref": "#/$defs/Condition"
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Step inputs, configurations, and payload templates.",
+          "additionalProperties": true,
+          "default": {}
+        },
+        "retryPolicy": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "$ref": "#/$defs/Timeout"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Condition": {
+      "type": "object",
+      "description": "Execution precondition evaluated before scheduling the step.",
+      "required": [
+        "type",
+        "source"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Comparison operator (e.g., 'equals', 'not_equals', 'in', 'exists').",
+          "enum": [
+            "equals",
+            "not_equals",
+            "in",
+            "not_in",
+            "exists",
+            "not_exists"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "description": "Path to variable or input field (e.g., 'form_item.dataValues.WebsakArkivKode')."
+        },
+        "value": {
+          "description": "Target comparison value or list of values."
+        }
+      },
+      "additionalProperties": false
+    },
+    "RetryPolicy": {
+      "type": "object",
+      "description": "Temporal activity retry policy specification.",
+      "properties": {
+        "initialInterval": {
+          "type": ["string", "number"],
+          "description": "Initial retry interval in seconds or ISO duration (e.g., '1s' or 1)."
+        },
+        "backoffCoefficient": {
+          "type": "number",
+          "description": "Rate at which retry interval increases (default 2.0).",
+          "minimum": 1.0
+        },
+        "maximumInterval": {
+          "type": ["string", "number"],
+          "description": "Maximum retry interval in seconds or ISO duration."
+        },
+        "maximumAttempts": {
+          "type": "integer",
+          "description": "Maximum retry attempts (0 for unlimited).",
+          "minimum": 0
+        },
+        "nonRetryableErrorTypes": {
+          "type": "array",
+          "description": "List of error types that should not trigger a retry.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Timeout": {
+      "type": "object",
+      "description": "Temporal activity timeout specifications.",
+      "properties": {
+        "startToCloseTimeout": {
+          "type": ["string", "number"],
+          "description": "Maximum execution time for a single activity attempt."
+        },
+        "scheduleToCloseTimeout": {
+          "type": ["string", "number"],
+          "description": "Maximum total time from schedule to completion across all retries."
+        },
+        "heartbeatTimeout": {
+          "type": ["string", "number"],
+          "description": "Maximum interval between activity progress heartbeats."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

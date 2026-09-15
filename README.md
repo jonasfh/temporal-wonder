@@ -23,6 +23,29 @@ flowchart TD
 
 ---
 
+## Prosjektstruktur
+
+```text
+temporal-wonder/
+├── .devcontainer/                # Devcontainer-oppsett for Python 3.14 & uv
+├── schemas/
+│   └── manifest.schema.json      # Formelt JSON Schema for integrasjons-DAG
+├── examples/
+│   ├── sample-manifest.yaml      # Eksempelmanifest med Strangler Fig (legacy & native)
+│   └── sample-manifest.json      # JSON-variant for skjemavalidering
+├── src/
+│   └── temporal_wonder/
+│       ├── models/               # Pydantic v2-modeller, DAG-validering og migreringsverktøy
+│       ├── workflows/            # Deterministiske Temporal master- og delworkflows
+│       └── activities/           # I/O-aktiviteter (legacy Logic Apps og native Altinn 3)
+│           ├── legacy/           # HTTP-aktiviteter for uthenting og delegering til Logic Apps
+│           └── native/           # Direkte integrasjoner (Altinn 3, filkonvertering, lagring)
+└── tests/                        # Pytest enhets-, skjema- og workflowtester
+    └── unit/                     # Skjemavalidering, DAG-syklusdeteksjon og migrasjonstester
+```
+
+---
+
 ## Agent- og utviklerretningslinjer
 
 For fullstendige instruksjoner og retningslinjer:
