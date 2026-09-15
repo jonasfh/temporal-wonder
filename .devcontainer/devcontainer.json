@@ -2,22 +2,23 @@
   "name": "Temporal Wonder (Python 3.14)",
   "build": {
     "dockerfile": "Dockerfile",
-    "context": "..",
-    "args": {
-      "USER_UID": "${localEnv:UID:-1000}",
-      "USER_GID": "${localEnv:GID:-1000}"
-    }
+    "context": ".."
   },
   "remoteUser": "vscode",
   "containerUser": "vscode",
-  "updateRemoteUserUID": true,
+  "updateRemoteUserUID": false,
+  "containerEnv": {
+    "UV_VENV_CLEAR": "1",
+    "SHELL": "/bin/bash"
+  },
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}
   },
   "customizations": {
     "vscode": {
       "settings": {
-        "python.defaultInterpreterPath": "/workspace/.venv/bin/python",
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
+        "terminal.integrated.defaultProfile.linux": "bash",
         "python.testing.pytestEnabled": true,
         "python.testing.pytestArgs": [
           "tests"
@@ -42,7 +43,7 @@
       ]
     }
   },
-  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.gemini; uv venv && uv pip install -e \".[dev]\"",
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.gemini; UV_VENV_CLEAR=1 uv venv && uv pip install -e \".[dev]\"",
   "mounts": [
     "source=${localWorkspaceFolderBasename}-gemini-data,target=/home/vscode/.gemini,type=volume"
   ]
