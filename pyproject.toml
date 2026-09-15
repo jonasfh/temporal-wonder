@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "temporal-wonder"
+version = "0.1.0"
+description = "Temporal integration orchestrator prototype evaluating Strangler Fig migration at Finanstilsynet"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Jonas F. H.", email = "jofh@finanstilsynet.no" },
+]
+dependencies = [
+    "pydantic>=2.7.0",
+    "pyyaml>=6.0.1",
+    "jsonschema>=4.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+    "types-PyYAML>=6.0.12",
+    "types-jsonschema>=4.20.0",
+]
+temporal = [
+    "temporalio>=1.6.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/temporal_wonder"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [".agents"]
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "UP",    # pyupgrade
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "RUF",   # Ruff-specific rules
+]
+ignore = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["src"]

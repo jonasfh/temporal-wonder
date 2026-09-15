@@ -1,0 +1,413 @@
+{
+  "identifier": "krt-0000a-1",
+  "classification": "K2",
+  "domain": "bank",
+  "title": "Åpen test skjema",
+  "description": "Test-workflow",
+  "is_active": true,
+  "system_options": {
+    "top_level_folder": "bank"
+  },
+  "integrations": [
+    {
+      "type": "conf_teamspost",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Post til VERDI sin teams-kanal",
+      "description": "Hver ny melding skal postes til Teams-kanalen til Verdi. Url til teams-kanalen inneholder en secret så den må lagres i KeyVault",
+      "config": {
+        "uri_keyvault_secret": "int_teams_notification_krt1801"
+      }
+    },
+    {
+      "type": "conf_send_email",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Send epost til Jonas for test",
+      "description": "Test Jonas",
+      "condition": {
+        "type": "in",
+        "source": "form_item.dataValues.WebsakArkivKode",
+        "value": [
+          "511.6"
+        ]
+      },
+      "config": {
+        "email_template": "websak_intern_manuell_behandling",
+        "variables": {
+          "EMAIL_SUBJECT_ENV_PREFIX": {
+            "default": "DEV:"
+          },
+          "INNFIL_ENV_FOLDER": {
+            "default": "INNFIL_TEST"
+          },
+          "RECIPIENT": {
+            "default": "jofh@finanstilsynet.no"
+          },
+          "APP_ID": {
+            "required": true,
+            "source": "manifest_item.identifier"
+          },
+          "SKJEMA": {
+            "required": true,
+            "source": "manifest_item.identifier",
+            "transform": "removeSuffixA1Uppercase"
+          },
+          "SKJEMA_TITTEL": {
+            "required": true,
+            "source": "manifest_item.title"
+          },
+          "INNSENDERNAVN": {
+            "required": true,
+            "source": "form_item.dataValues.Innsendernavn"
+          },
+          "KONTAKTPERSON_NAVN": {
+            "required": false,
+            "source": "form_item.dataValues.Kontaktperson1Navn",
+            "default": ""
+          },
+          "KONTAKTPERSON_EPOST": {
+            "required": false,
+            "source": "form_item.dataValues.Kontaktperson1Epost",
+            "default": ""
+          },
+          "SOKEFELT": {
+            "required": false,
+            "source": "form_item.dataValues.WebSakSokeOrd",
+            "default": ""
+          },
+          "ARKIVREFERANSE": {
+            "required": true,
+            "source": "form_item.id",
+            "transform": "lastSegment"
+          },
+          "INNSENDER_ORGNR": {
+            "required": false,
+            "source": "form_item.instanceOwner.organisationNumber"
+          },
+          "TOP_LEVEL_FOLDER": {
+            "required": true,
+            "source": "manifest_item.system_options.top_level_folder"
+          },
+          "PARTYID": {
+            "required": false,
+            "source": "form_item.instanceOwner.partyId"
+          }
+        }
+      }
+    },
+    {
+      "type": "conf_send_email",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Send epost til Lema for test",
+      "description": "Test Lema",
+      "config": {
+        "email_template": "internvarsling",
+        "variables": {
+          "EMAIL_SUBJECT_ENV_PREFIX": {
+            "default": "DEV:"
+          },
+          "INNFIL_ENV_FOLDER": {
+            "default": "INNFIL_TEST"
+          },
+          "RECIPIENT": {
+            "default": "lema.sediqi@finanstilsynet.no"
+          },
+          "APP_ID": {
+            "required": true,
+            "source": "manifest_item.identifier"
+          },
+          "SKJEMA": {
+            "required": true,
+            "source": "manifest_item.identifier",
+            "transform": "removeSuffixA1Uppercase"
+          },
+          "SKJEMA_TITTEL": {
+            "required": true,
+            "source": "manifest_item.title"
+          },
+          "INNSENDERNAVN": {
+            "required": true,
+            "source": "form_item.dataValues.Innsendernavn"
+          },
+          "ARKIVREFERANSE": {
+            "required": true,
+            "source": "form_item.id",
+            "transform": "lastSegment"
+          },
+          "INNSENDER_ORGNR": {
+            "required": false,
+            "source": "form_item.instanceOwner.organisationNumber"
+          },
+          "TOP_LEVEL_FOLDER": {
+            "required": true,
+            "source": "manifest_item.system_options.top_level_folder"
+          },
+          "PARTYID": {
+            "required": false,
+            "source": "form_item.instanceOwner.partyId"
+          }
+        }
+      }
+    },
+    {
+      "type": "conf_send_email",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Send templatbasert epost til jonas for test",
+      "description": "Test jonas",
+      "config": {
+        "email_template": "internvarsling",
+        "variables": {
+          "EMAIL_SUBJECT_ENV_PREFIX": {
+            "default": "DEV:"
+          },
+          "INNFIL_ENV_FOLDER": {
+            "default": "INNFIL_TEST"
+          },
+          "RECIPIENT": {
+            "required": true,
+            "source": "form_item.dataValues.Kontaktperson1Epost"
+          },
+          "APP_ID": {
+            "required": true,
+            "source": "manifest_item.identifier"
+          },
+          "SKJEMA": {
+            "required": true,
+            "source": "manifest_item.identifier",
+            "transform": "removeSuffixA1Uppercase"
+          },
+          "SKJEMA_TITTEL": {
+            "required": true,
+            "source": "manifest_item.title"
+          },
+          "INNSENDERNAVN": {
+            "required": true,
+            "source": "form_item.dataValues.Innsendernavn"
+          },
+          "ARKIVREFERANSE": {
+            "required": true,
+            "source": "form_item.id",
+            "transform": "lastSegment"
+          },
+          "INNSENDER_ORGNR": {
+            "required": false,
+            "source": "form_item.instanceOwner.organisationNumber"
+          },
+          "TOP_LEVEL_FOLDER": {
+            "required": true,
+            "source": "manifest_item.system_options.top_level_folder"
+          },
+          "PARTYID": {
+            "required": false,
+            "source": "form_item.instanceOwner.partyId"
+          }
+        }
+      }
+    },
+    {
+      "type": "conf_send_email",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Send templatbasert epost til mohammed for test",
+      "description": "test mohammed",
+      "config": {
+        "email_template": "internvarsling",
+        "send_attachments": true,
+        "variables": {
+          "EMAIL_SUBJECT_ENV_PREFIX": {
+            "default": "DEV:"
+          },
+          "INNFIL_ENV_FOLDER": {
+            "default": "INNFIL_TEST"
+          },
+          "RECIPIENT": {
+            "required": true,
+            "default": "mohammed.borhan.hussaini@finanstilsynet.no"
+          },
+          "APP_ID": {
+            "required": true,
+            "source": "manifest_item.identifier"
+          },
+          "SKJEMA": {
+            "required": true,
+            "source": "manifest_item.identifier",
+            "transform": "removeSuffixA1Uppercase"
+          },
+          "SKJEMA_TITTEL": {
+            "required": true,
+            "source": "manifest_item.title"
+          },
+          "INNSENDERNAVN": {
+            "required": true,
+            "source": "form_item.dataValues.Innsendernavn"
+          },
+          "ARKIVREFERANSE": {
+            "required": true,
+            "source": "form_item.id",
+            "transform": "lastSegment"
+          },
+          "INNSENDER_ORGNR": {
+            "required": false,
+            "source": "form_item.instanceOwner.organisationNumber"
+          },
+          "TOP_LEVEL_FOLDER": {
+            "required": true,
+            "source": "manifest_item.system_options.top_level_folder"
+          },
+          "PARTYID": {
+            "required": false,
+            "source": "form_item.instanceOwner.partyId"
+          }
+        }
+      }
+    },
+    {
+      "type": "conf_dist_sharepoint",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Sharepoint-integrasjon",
+      "description": "Sharepoint-integrasjonen kopierer data til sharepoint-området INNFIL. Erstatter det gamle V-området som ble brukt til å tilgjengeligge data. Tilgj. felt: source_directory, source_file_name",
+      "config": {}
+    },
+    {
+      "type": "conf_send_altinn_melding",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Send melding via altinn3 systemet",
+      "description": "Denne konfigurasjonen sender en melding via altinn3 systemet. RECIPIENT kan være aulike typer, så RECIPIENT_PREFIX må angis. Fra dokumentasjon i Altinn3: List of recipients for the correspondence: organization (urn:altinn:organization:identifier-no:ORGNR), national identity number (urn:altinn:person:identifier-no:SSN), self identified user (urn:altinn:person:idporten-email:EMAIL), or legacy selfidentified user (urn:altinn:person:legacy-selfidentified:USERNAME). Variabler i vartiables resolves med samme funksjonalitet som i email-template, så source og transform kan brukes for å hente ut riktig verdi fra form_item eller manifest_item.",
+      "config": {
+        "subject": "[{{SUBJECT_ENV_PREFIX}}] Testmelding for {{SKJEMA}} - {{SKJEMA_TITTEL}}",
+        "body": "<html><body>Dette er en testmelding sendt av {{RECIPIENT}} fra datahub via altinn3 system</body></html>",
+        "variables": {
+          "SUBJECT_ENV_PREFIX": {
+            "default": "DEV:"
+          },
+          "RECIPIENT": {
+            "required": true,
+            "source": "form_item.instanceOwner.organisationNumber"
+          },
+          "RECIPIENT_PREFIX": {
+            "default": "urn:altinn:organization:identifier-no:",
+            "source": "optional_data_item.recipient_prefix"
+          },
+          "SKJEMA": {
+            "required": true,
+            "source": "manifest_item.identifier",
+            "transform": "removeSuffixA1Uppercase"
+          },
+          "SKJEMA_TITTEL": {
+            "required": true,
+            "source": "manifest_item.title"
+          },
+          "ALTINN_INSTANCE_ID": {
+            "required": true,
+            "source": "form_item.id"
+          }
+        }
+      }
+    },
+    {
+      "type": "conf_adls_to_fileshare",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Kopier innkommende data til HUBEX filområde",
+      "config": {
+        "source_container": "altinn3",
+        "source_directory__opt": null,
+        "source_file_name__opt": null,
+        "source_storage_url": "https://stinttempdev0109d0.dfs.core.windows.net",
+        "sink_directory": "test\\krt-0000a-1",
+        "sink_file_name__opt": null,
+        "sink_user_name": "KT\\inthub_adf_dev",
+        "sink_host": "\\\\Vm-trs2tst-app3\\dora",
+        "sink_akv_name": "https://kv-shd-int-dev-we-01.vault.azure.net/",
+        "sink_akv_secret_name": "adf-onprem-fileshare-password"
+      }
+    },
+    {
+      "type": "conf_adls_to_adls",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Kopier data fra integrasjon temp til datahub",
+      "config": {
+        "source_container": "altinn3",
+        "source_storage_url": "https://stinttempdev0109d0.dfs.core.windows.net",
+        "sink_directory_root__opt": "adls_sync/altinn3",
+        "sink_storage_url": "https://stdatahubdatadev01.dfs.core.windows.net",
+        "sink_container": "ingestion"
+      }
+    },
+    {
+      "type": "conf_dist_hubex",
+      "triggered_by": "wf_zip",
+      "name": "Send til Hubex",
+      "description": "Konfig som brukes av wf_dist_hubex_shared. Konfig info for ADF",
+      "config": {
+        "source_container": "tobezip",
+        "source_storage_url": "https://stinttempdev0109d0.dfs.core.windows.net",
+        "sink_directory": "Outgoing",
+        "sink_file_name__opt": null,
+        "sink_user_name": "KT\\inthub_adf_dev",
+        "sink_host": "\\\\Vm-trs2tst-app3\\CSDR",
+        "sink_akv_name": "https://kv-shd-int-dev-we-01.vault.azure.net/",
+        "sink_akv_secret_name": "adf-onprem-fileshare-password"
+      }
+    },
+    {
+      "type": "conf_rename_xml",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Rename xml attachment as per spesification from EBA",
+      "description": "Rename incoming XML files as per spesification from EBA."
+    },
+    {
+      "type": "conf_zip",
+      "triggered_by": "wf_rename_xml",
+      "name": "Rename xml attachment as per spesification from EBA",
+      "description": "Rename incoming XML files as per spesification from EBA.",
+      "config": {
+        "source_container": "tobezip",
+        "target_container": "tobezip"
+      }
+    },
+    {
+      "type": "conf_dist_websak",
+      "triggered_by": "wf_altinn_instance_handling_shared",
+      "name": "Websak-integrasjon",
+      "description": "Kobling til Websak for å opprette sak og journalpost."
+    },
+    {
+      "type": "conf_send_email",
+      "triggered_by": "wf_websak_opprett_shared",
+      "name": "Varsel om mottatt søknad - KRT-3000",
+      "description": "Varsel om mottatt søknad sendes til kontaktperson i skjemaet.",
+      "config": {
+        "email_template": "krt-3000",
+        "variables": {
+          "EMAIL_SUBJECT_ENV_PREFIX": {
+            "default": "DEV:"
+          },
+          "SKJEMA": {
+            "required": true,
+            "source": "manifest_item.identifier",
+            "transform": "removeSuffixA1Uppercase"
+          },
+          "SKJEMA_TITTEL": {
+            "required": true,
+            "source": "manifest_item.title"
+          },
+          "INNSENDERNAVN": {
+            "required": true,
+            "source": "form_item.dataValues.Innsendernavn"
+          },
+          "ARKIVREFERANSE": {
+            "required": true,
+            "source": "form_item.id",
+            "transform": "lastSegment"
+          },
+          "SAKSNUMMER": {
+            "required": false,
+            "source": "optional_data_item.websak_journal_number"
+          },
+          "RECIPIENT": {
+            "required": true,
+            "source": "paulo.rocha@finanstilsynet.no"
+          }
+        }
+      }
+    }
+  ]
+}
