@@ -27,7 +27,9 @@ flowchart TD
 
 ```text
 temporal-wonder/
-├── .devcontainer/                # Devcontainer-oppsett for Python 3.14 & uv
+├── .devcontainer/                # Devcontainer-oppsett for Python 3.14, uv & Docker
+├── docker-compose.yml            # Lokal stack: Temporal dev-server (UI: 8233) & Azurite
+├── .env.example                  # Eksempel-miljøvariabler for lokal kjøring
 ├── schemas/
 │   └── manifest.schema.json      # Formelt JSON Schema for integrasjons-DAG
 ├── examples/
@@ -35,13 +37,71 @@ temporal-wonder/
 │   └── sample-manifest.json      # JSON-variant for skjemavalidering
 ├── src/
 │   └── temporal_wonder/
-│       ├── models/               # Pydantic v2-modeller, DAG-validering og migreringsverktøy
-│       ├── workflows/            # Deterministiske Temporal master- og delworkflows
+│       ├── config.py             # Pydantic Settings for miljø- og tjenestekonfigurasjon
+│       ├── worker.py             # Temporal worker-prosess som poller oppgavekøen
+│       ├── starter.py            # CLI-verktøy for å starte integrasjons-DAG workflows
+│       ├── models/               # Pydantic v2-modeller, DAG-validering og migrering
+│       ├── workflows/            # Deterministiske Temporal orchestrator-workflows
 │       └── activities/           # I/O-aktiviteter (legacy Logic Apps og native Altinn 3)
-│           ├── legacy/           # HTTP-aktiviteter for uthenting og delegering til Logic Apps
-│           └── native/           # Direkte integrasjoner (Altinn 3, filkonvertering, lagring)
+│           ├── legacy/           # HTTP-aktiviteter for delegering til Logic Apps
+│           └── native/           # Direkte integrasjoner (Altinn 3, Azure Blob, transformasjon)
 └── tests/                        # Pytest enhets-, skjema- og workflowtester
-    └── unit/                     # Skjemavalidering, DAG-syklusdeteksjon og migrasjonstester
+    └── unit/                     # Konfigurasjon, docker-compose, skjema, DAG og workflowtester
+```
+
+---
+
+## Lokalt utviklermiljø
+
+Plattformen støtter et fullverdig lokalt utviklermiljø uten avhengigheter til Azure-skyressurser.
+
+```mermaid
+flowchart LR
+    Dev["Utvikler / Agent"] -->|docker compose up| Stack["Lokal Stack"]
+    subgraph Stack
+        T["Temporal Server + Web UI (:8233)"]
+        DB[("SQLite Persistens")]
+        Az["Azurite: Blob Emulator (:10000)"]
+    end
+```
+
+### 1. Start lokal infrastruktur
+Start Temporal dev-server og Azurite med Docker Compose:
+```bash
+docker compose up -d
+```
+Tjenestene blir tilgjengelige på:
+- **Temporal Web UI**: [http://localhost:8233](http://localhost:8233)
+- **Temporal gRPC API**: `localhost:7233`
+- **Azurite Blob Service**: `http://localhost:10000`
+
+### 2. Konfigurasjon
+Kopier eksempelkonfigurasjonen til `.env` ved behov:
+```bash
+cp .env.example .env
+```
+
+### 3. Kjør worker lokalt
+I en terminal, start Temporal workeren:
+```bash
+uv run python -m temporal_wonder.worker
+```
+Workeren kobler seg til `localhost:7233`, registrerer `IntegrationOrchestratorWorkflow` samt aktiviteter, og begynner å polle oppgavekøen.
+
+### 4. Start en manuell testflyt
+I en annen terminal, start en workflow basert på et eksempelmanifest:
+```bash
+uv run python -m temporal_wonder.starter
+```
+Du kan også spesifisere en valgfri manifestfil eller egendefinert workflow ID:
+```bash
+uv run python -m temporal_wonder.starter --manifest examples/sample-manifest.yaml --workflow-id test-krt-run-1
+```
+Åpne [http://localhost:8233](http://localhost:8233) i nettleseren for å inspisere kjøringen, hendelseshistorikk og tidslinje for hvert steg i DAG-en.
+
+### 5. Stopp lokal infrastruktur
+```bash
+docker compose down
 ```
 
 ---

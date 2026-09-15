@@ -12,7 +12,23 @@
     "SHELL": "/bin/bash"
   },
   "features": {
-    "ghcr.io/devcontainers/features/git:1": {}
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "forwardPorts": [7233, 8233, 10000],
+  "portsAttributes": {
+    "7233": {
+      "label": "Temporal gRPC Server",
+      "onAutoForward": "silent"
+    },
+    "8233": {
+      "label": "Temporal Web UI",
+      "onAutoForward": "notify"
+    },
+    "10000": {
+      "label": "Azurite Blob Storage",
+      "onAutoForward": "silent"
+    }
   },
   "customizations": {
     "vscode": {
