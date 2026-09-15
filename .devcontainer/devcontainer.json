@@ -2,8 +2,15 @@
   "name": "Temporal Wonder (Python 3.14)",
   "build": {
     "dockerfile": "Dockerfile",
-    "context": ".."
+    "context": "..",
+    "args": {
+      "USER_UID": "${localEnv:UID:-1000}",
+      "USER_GID": "${localEnv:GID:-1000}"
+    }
   },
+  "remoteUser": "vscode",
+  "containerUser": "vscode",
+  "updateRemoteUserUID": true,
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}
   },
