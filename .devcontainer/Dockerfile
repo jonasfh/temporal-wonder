@@ -15,7 +15,8 @@ ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-RUN if getent group $USER_GID > /dev/null 2>&1; then \
+RUN test "$USER_UID" -gt 0 && test "$USER_GID" -gt 0 || { echo "USER_UID and USER_GID must be positive integers. If host user IDs are unavailable, set them explicitly or disable updateRemoteUserUID."; exit 1; } \
+    && if getent group $USER_GID > /dev/null 2>&1; then \
         EXISTING_GROUP=$(getent group $USER_GID | cut -d: -f1); \
         if [ "$EXISTING_GROUP" != "$USERNAME" ]; then \
             groupmod -n $USERNAME $EXISTING_GROUP; \
